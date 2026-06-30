@@ -8,10 +8,10 @@
 .chat-sidebar {
   background: #0f172a;
   color: white;
-  padding: 24px;
+  padding: 5px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 0px;
 }
 
 .brand-block {
@@ -50,6 +50,7 @@
   cursor: pointer;
   font-weight: 700;
 }
+
 
 .sidebar-section h4 {
   color: #cbd5e1;
@@ -265,7 +266,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 0px;
     width: 100%;
 }
 
