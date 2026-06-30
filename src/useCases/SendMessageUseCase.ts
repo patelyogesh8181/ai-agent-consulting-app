@@ -1,14 +1,18 @@
-import type { ChatMessage } from "../domain/entities/ChatMessage";
-import { ChatApiClient } from "../infrastructure/api/ChatApi";
+import type { ChatMessage } from "../domain/models/ChatMessage";
+import type { IChatRepository } from "../domain/repositories/IChatRepository";
 
 export class SendMessageUseCase {
-  constructor(private readonly chatApiClient: ChatApiClient) {}
+  private readonly chatRepository: IChatRepository;
 
-  async execute(message: string): Promise<ChatMessage> {
+  constructor(chatRepository: IChatRepository) {
+    this.chatRepository = chatRepository;
+  }
+
+  async execute(message: string, history: ChatMessage[]): Promise<ChatMessage> {
     if (!message.trim()) {
       throw new Error("Message cannot be empty.");
     }
 
-    return this.chatApiClient.sendMessage(message);
+    return this.chatRepository.sendMessage(message, history);
   }
 }

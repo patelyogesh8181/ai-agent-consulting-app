@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChatMessage } from "../domain/entities/ChatMessage";
+import { ChatMessage } from "../../domain/models/ChatMessage";
 
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
