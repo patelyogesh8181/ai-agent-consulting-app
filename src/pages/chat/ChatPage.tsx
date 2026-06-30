@@ -136,14 +136,6 @@ export function ChatPage() {
   return (
     <section className="enterprise-chat-page">
       <aside className="chat-sidebar">
-        <div className="brand-block">
-          <div className="brand-icon">AI</div>
-          <div>
-            <h2>Consulting Agent</h2>
-            <p>Enterprise Architecture Assistant</p>
-          </div>
-        </div>
-
         <button className="new-chat-button" onClick={createNewChat}>
           + New Chat
         </button>
@@ -170,15 +162,6 @@ export function ChatPage() {
       </aside>
 
       <main className="chat-main">
-        <header className="chat-header">
-          <div>
-            <h1>IT Consulting AI Agent</h1>
-            <p>Architecture-grade guidance powered by your C# AI API</p>
-          </div>
-
-          <span className="status-pill">Online</span>
-        </header>
-
         <div className="chat-conversation">
           {messages.map((message) => (
             <article
