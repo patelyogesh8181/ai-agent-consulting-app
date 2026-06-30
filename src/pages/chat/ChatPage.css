@@ -107,7 +107,7 @@
   display: grid;
   grid-template-columns: 48px minmax(0, 820px);
   gap: 14px;
-  margin-bottom: 24px;
+  margin-bottom: 5px;
 }
 
 .chat-message-row.user {
@@ -148,7 +148,7 @@
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  padding: 18px 20px;
+  padding: 5px 15px;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
@@ -187,41 +187,110 @@
 }
 
 .chat-composer {
-  background: white;
-  border-top: 1px solid #e5e7eb;
-  padding: 20px 32px;
-  display: grid;
-  grid-template-columns: 1fr 110px;
-  gap: 14px;
+    padding: 20px 30px;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
 }
 
-.chat-composer textarea {
-  resize: none;
-  min-height: 58px;
-  max-height: 160px;
-  border: 1px solid #cbd5e1;
-  border-radius: 14px;
-  padding: 16px;
-  font-size: 15px;
-  outline: none;
+.composer-container {
+
+    position: relative;
+
+    width: 100%;
+    max-width: 900px;
+
+    margin: auto;
 }
 
-.chat-composer textarea:focus {
-  border-color: #2563eb;
+.composer-container textarea {
+
+    width: 100%;
+
+    min-height: 60px;
+    max-height: 180px;
+
+    resize: none;
+
+    border: 1px solid #d1d5db;
+    border-radius: 18px;
+
+    padding: 16px 0px 16px 18px;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+
+    outline: none;
+
+    transition: .2s;
 }
 
-.chat-composer button {
-  border: none;
-  border-radius: 14px;
-  background: #2563eb;
-  color: white;
-  font-weight: 800;
-  cursor: pointer;
+.composer-container textarea:focus {
+
+    border-color: #2563eb;
+
+    box-shadow: 0 0 0 4px rgba(37,99,235,.10);
 }
 
-.chat-composer button:disabled {
-  background: #94a3b8;
-  cursor: not-allowed;
+.send-button {
+
+    position: absolute;
+
+    right: 12px;
+    bottom: 12px;
+
+    width: 42px;
+    height: 42px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.send-button:hover:not(:disabled) {
+
+    background: #1d4ed8;
+
+    transform: scale(1.05);
+}
+
+.send-button:disabled {
+
+    background: #94a3b8;
+
+    cursor: not-allowed;
+}
+
+.spinner {
+
+    width: 18px;
+    height: 18px;
+
+    border: 2px solid rgba(255,255,255,.3);
+    border-top-color: white;
+
+    border-radius: 50%;
+
+    animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .typing-indicator {

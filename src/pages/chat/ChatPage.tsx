@@ -141,7 +141,7 @@ export function ChatPage() {
         </button>
 
         <div className="sidebar-section">
-          <h4>Chat History</h4>
+          <h4>Recents</h4>
 
           <div className="chat-history-list">
             {sessions.map((session) => (
@@ -215,21 +215,43 @@ export function ChatPage() {
         </div>
 
         <footer className="chat-composer">
-          <textarea
-            value={input}
-            placeholder="Ask about cloud architecture, modernization, DevOps, MCP, RAG, or AI agents..."
-            onChange={(event) => setInput(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                handleSend();
-              }
-            }}
-          />
+          <div className="composer-container">
+            <textarea
+              value={input}
+              rows={1}
+              placeholder="Message Enterprise AI Consultant..."
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+            />
 
-          <button onClick={handleSend} disabled={loading || !input.trim()}>
-            Send
-          </button>
+            <button
+              className="send-button"
+              onClick={handleSend}
+              disabled={loading || !input.trim()}
+              aria-label="Send message"
+            >
+              {loading ? (
+                <span className="spinner"></span>
+              ) : (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M22 2L11 13" />
+                  <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+                </svg>
+              )}
+            </button>
+          </div>
         </footer>
       </main>
     </section>
