@@ -271,22 +271,6 @@ export function ChatPage() {
                           onRename={() => startRename(session)}
                           onDelete={() => deleteChat(session.id)}
                         />
-                        // <div className="history-menu">
-                        //   <button onClick={() => pinChat(session.id)}>
-                        //     {session.isPinned ? "Unpin" : "Pin"}
-                        //   </button>
-
-                        //   <button onClick={() => startRename(session)}>
-                        //     Rename
-                        //   </button>
-
-                        //   <button
-                        //     className="danger"
-                        //     onClick={() => deleteChat(session.id)}
-                        //   >
-                        //     Delete
-                        //   </button>
-                        // </div>
                       )}
                     </div>
                   </>
