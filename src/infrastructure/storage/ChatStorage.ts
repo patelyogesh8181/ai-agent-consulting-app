@@ -10,10 +10,21 @@ export class ChatStorage {
     if (!value) return [];
 
     try {
-      return JSON.parse(value) as ChatSession[];
+      const sessions = JSON.parse(value) as ChatSession[];
+
+      return this.sortSessions(
+        sessions.map((session) => ({
+          ...session,
+          isPinned: session.isPinned ?? false,
+        })),
+      );
     } catch {
       return [];
     }
+  }
+
+  getSession(chatId: string): ChatSession | undefined {
+    return this.getSessions().find((session) => session.id === chatId);
   }
 
   saveSessions(sessions: ChatSession[]): void {
@@ -61,8 +72,56 @@ export class ChatStorage {
     this.saveSessions(updated);
   }
 
-  getSession(chatId: string): ChatSession | undefined {
-    return this.getSessions().find((x) => x.id === chatId);
+  pinSession(chatId: string): ChatSession[] {
+    const sessions = this.getSessions().map((session) =>
+      session.id === chatId
+        ? {
+            ...session,
+            isPinned: !session.isPinned,
+            updatedAt: new Date().toISOString(),
+          }
+        : session,
+    );
+
+    const sortedSessions = this.sortSessions(sessions);
+
+    this.saveSessions(sortedSessions);
+
+    return sortedSessions;
+  }
+
+  renameSession(chatId: string, title: string): ChatSession[] {
+    const sessions = this.getSessions().map((session) =>
+      session.id === chatId
+        ? {
+            ...session,
+            title: title.trim() || "New Chat",
+            updatedAt: new Date().toISOString(),
+          }
+        : session,
+    );
+
+    this.saveSessions(sessions);
+
+    return this.getSessions();
+  }
+
+  deleteSession(chatId: string): ChatSession[] {
+    const sessions = this.getSessions().filter((x) => x.id !== chatId);
+
+    this.saveSessions(sessions);
+
+    const activeChatId = this.getActiveChatId();
+
+    if (activeChatId === chatId) {
+      if (sessions.length > 0) {
+        this.setActiveChatId(sessions[0].id);
+      } else {
+        localStorage.removeItem(ACTIVE_CHAT_KEY);
+      }
+    }
+
+    return this.getSessions();
   }
 
   private generateTitle(messages: ChatMessage[]): string {
@@ -73,5 +132,14 @@ export class ChatStorage {
     return firstUserMessage.content.length > 40
       ? `${firstUserMessage.content.substring(0, 40)}...`
       : firstUserMessage.content;
+  }
+
+  private sortSessions(sessions: ChatSession[]): ChatSession[] {
+    return [...sessions].sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
   }
 }

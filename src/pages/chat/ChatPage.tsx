@@ -5,20 +5,22 @@ import { container } from "../../app/container";
 import { ChatStorage } from "../../infrastructure/storage/ChatStorage";
 import "./ChatPage.css";
 import type { ChatSession } from "../../domain/models/ChatSession";
+import { ChatHistoryMenu } from "../../presentation/components/chat/ChatHistoryMenu";
 
 const chatStorage = new ChatStorage();
 
-const welcomeMessage: ChatMessage = {
+const welcomeMessage = (): ChatMessage => ({
   id: crypto.randomUUID(),
   role: "assistant",
   content:
     "Hello. I am your Enterprise IT Consulting AI Agent. Ask me about enterprise architecture, cloud modernization, DevOps, AI agents, security, or solution design.",
   createdAt: new Date().toISOString(),
-};
+});
 
 const createEmptySession = (): ChatSession => ({
   id: crypto.randomUUID(),
   title: "New Chat",
+  isPinned: false,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   messages: [welcomeMessage],
@@ -53,6 +55,9 @@ export function ChatPage() {
 
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
   useEffect(() => {
     if (!activeChatId) return;
@@ -123,6 +128,7 @@ export function ChatPage() {
     setActiveChatId(newSession.id);
     setMessages(newSession.messages);
     setInput("");
+    setOpenMenuId(null);
   };
 
   const openChat = (session: ChatSession) => {
@@ -131,6 +137,61 @@ export function ChatPage() {
     setActiveChatId(session.id);
     setMessages([...session.messages]); // create a new array reference
     setInput("");
+    setOpenMenuId(null);
+  };
+
+  const pinChat = (sessionId: string) => {
+    const updatedSessions = container.chatHistoryUseCase.pin(sessionId);
+
+    setSessions([...updatedSessions]);
+
+    setOpenMenuId(null);
+  };
+
+  const startRename = (session: ChatSession) => {
+    setRenamingChatId(session.id);
+    setRenameValue(session.title);
+    setOpenMenuId(null);
+  };
+
+  const saveRename = (sessionId: string) => {
+    const updatedSessions = container.chatHistoryUseCase.rename(
+      sessionId,
+      renameValue,
+    );
+
+    setSessions(updatedSessions);
+    setRenamingChatId(null);
+    setRenameValue("");
+  };
+
+  const cancelRename = () => {
+    setRenamingChatId(null);
+    setRenameValue("");
+  };
+
+  const deleteChat = (sessionId: string) => {
+    const updatedSessions = container.chatHistoryUseCase.delete(sessionId);
+
+    setSessions(updatedSessions);
+
+    if (sessionId === activeChatId) {
+      if (updatedSessions.length > 0) {
+        const nextSession = updatedSessions[0];
+
+        chatStorage.setActiveChatId(nextSession.id);
+        setActiveChatId(nextSession.id);
+        setMessages(nextSession.messages);
+      } else {
+        const newSession = chatStorage.createSession([welcomeMessage()]);
+
+        setSessions(chatStorage.getSessions());
+        setActiveChatId(newSession.id);
+        setMessages(newSession.messages);
+      }
+    }
+
+    setOpenMenuId(null);
   };
 
   return (
@@ -145,17 +206,92 @@ export function ChatPage() {
 
           <div className="chat-history-list">
             {sessions.map((session) => (
-              <button
+              <div
                 key={session.id}
                 className={
                   session.id === activeChatId
-                    ? "chat-history-item active-chat"
-                    : "chat-history-item"
+                    ? "chat-history-row active-chat"
+                    : "chat-history-row"
                 }
-                onClick={() => openChat(session)}
               >
-                {session.title}
-              </button>
+                {renamingChatId === session.id ? (
+                  <div className="rename-box">
+                    <input
+                      value={renameValue}
+                      autoFocus
+                      onChange={(event) => setRenameValue(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          saveRename(session.id);
+                        }
+
+                        if (event.key === "Escape") {
+                          cancelRename();
+                        }
+                      }}
+                    />
+
+                    <div className="rename-actions">
+                      <button onClick={() => saveRename(session.id)}>
+                        Save
+                      </button>
+                      <button onClick={cancelRename}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      className="chat-history-content"
+                      onClick={() => openChat(session)}
+                    >
+                      <span className="chat-title">
+                        {session.isPinned ? "📌 " : ""}
+                        {session.title}
+                      </span>
+                    </button>
+
+                    <div className="history-menu-wrapper">
+                      <button
+                        className="history-more-button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setOpenMenuId(
+                            openMenuId === session.id ? null : session.id,
+                          );
+                        }}
+                        aria-label="Chat options"
+                      >
+                        ...
+                      </button>
+
+                      {openMenuId === session.id && (
+                        <ChatHistoryMenu
+                          isPinned={session.isPinned}
+                          onPin={() => pinChat(session.id)}
+                          onRename={() => startRename(session)}
+                          onDelete={() => deleteChat(session.id)}
+                        />
+                        // <div className="history-menu">
+                        //   <button onClick={() => pinChat(session.id)}>
+                        //     {session.isPinned ? "Unpin" : "Pin"}
+                        //   </button>
+
+                        //   <button onClick={() => startRename(session)}>
+                        //     Rename
+                        //   </button>
+
+                        //   <button
+                        //     className="danger"
+                        //     onClick={() => deleteChat(session.id)}
+                        //   >
+                        //     Delete
+                        //   </button>
+                        // </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -173,20 +309,6 @@ export function ChatPage() {
               </div>
 
               <div className="message-card">
-                <div className="message-meta">
-                  <strong>
-                    {message.role === "user"
-                      ? "You"
-                      : "Enterprise Consulting Agent"}
-                  </strong>
-                  <span>
-                    {new Date(message.createdAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </div>
-
                 <div className="message-content">
                   <ReactMarkdown>{message.content}</ReactMarkdown>
                 </div>

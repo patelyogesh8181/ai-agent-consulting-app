@@ -1,0 +1,11 @@
+.history-menu button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.menu-icon {
+  width: 20px;
+  display: inline-flex;
+  justify-content: center;
+}
