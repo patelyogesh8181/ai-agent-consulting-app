@@ -289,7 +289,7 @@ export function ChatPage() {
               className={`chat-message-row ${message.role}`}
             >
               <div className="avatar">
-                {message.role === "user" ? "You" : "AI"}
+                {message.role === "user" ? "User" : "AI"}
               </div>
 
               <div className="message-card">
