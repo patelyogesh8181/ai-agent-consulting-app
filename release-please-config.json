@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "ai-agent-consulting-app",
+      "component": "ai-agent-consulting-app",
+      "changelog-path": "CHANGELOG.md",
+      "include-component-in-tag": false,
+      "include-v-in-tag": true,
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "ai-agent-consulting-app/package.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
+          "path": "ai-agent-consulting-app/package-lock.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    }
+  }
+}
