@@ -48,9 +48,11 @@ export function ChatPage() {
       ? chatStorage.getSession(activeId)
       : undefined;
 
-    return activeSession?.messages?.length
-      ? activeSession.messages
-      : [welcomeMessage];
+    const messages = activeSession?.messages?.filter(
+      (message) => message != null && typeof message.role === "string",
+    );
+
+    return messages?.length ? messages : [welcomeMessage];
   });
 
   const [input, setInput] = useState("");
@@ -283,22 +285,23 @@ export function ChatPage() {
 
       <main className="chat-main">
         <div className="chat-conversation">
-          {messages.map((message) => (
-            <article
-              key={message.id}
-              className={`chat-message-row ${message.role}`}
-            >
-              <div className="avatar">
-                {message.role === "user" ? "You" : "AI"}
-              </div>
-
-              <div className="message-card">
-                <div className="message-content">
-                  <ReactMarkdown>{message.content}</ReactMarkdown>
+          {messages !== null &&
+            messages.map((message) => (
+              <article
+                key={message.id}
+                className={`chat-message-row ${message.role}`}
+              >
+                <div className="avatar">
+                  {message.role === "user" ? "You" : "AI"}
                 </div>
-              </div>
-            </article>
-          ))}
+
+                <div className="message-card">
+                  <div className="message-content">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
+                </div>
+              </article>
+            ))}
 
           {loading && (
             <article className="chat-message-row assistant">
